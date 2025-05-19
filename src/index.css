@@ -45,6 +45,11 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background-image: url('/lovable-uploads/86601c28-fd13-46c6-be9d-57d32660601c.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
   }
 }
 
@@ -61,4 +66,17 @@
 .pomodoro-container {
   transition: background-color 0.5s ease;
   box-shadow: 0 0 30px rgba(149, 128, 255, 0.2);
+}
+
+/* Add these styles for better readability with the background image */
+.card, .bg-card, .bg-card\/60 {
+  backdrop-filter: blur(8px);
+  background-color: rgba(23, 23, 23, 0.75) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.container {
+  position: relative;
+  z-index: 10;
 }
