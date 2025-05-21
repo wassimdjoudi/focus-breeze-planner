@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ListCheck, Plus, Trash2, Clock } from 'lucide-react';
+import { ListCheck, Plus, Trash2, Clock, AlertCircle, Calendar, Tag, Filter, CheckSquare, Square } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface Todo {
@@ -23,6 +23,7 @@ const TodoList = () => {
     return [];
   });
   const [newTodo, setNewTodo] = useState('');
+  const [filter, setFilter] = useState<'all' | 'active' | 'completed'>('all');
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
@@ -60,8 +61,16 @@ const TodoList = () => {
     }
   };
 
+  // Filter tasks based on current filter
+  const filteredTodos = todos.filter(todo => {
+    if (filter === 'all') return true;
+    if (filter === 'active') return !todo.completed;
+    if (filter === 'completed') return todo.completed;
+    return true;
+  });
+
   // Sort tasks: incomplete first, then by creation date
-  const sortedTodos = [...todos].sort((a, b) => {
+  const sortedTodos = [...filteredTodos].sort((a, b) => {
     if (a.completed !== b.completed) {
       return a.completed ? 1 : -1;
     }
@@ -84,13 +93,28 @@ const TodoList = () => {
     return `${days}d ago`;
   };
 
+  const activeTodosCount = todos.filter(todo => !todo.completed).length;
+  const completedTodosCount = todos.filter(todo => todo.completed).length;
+
   return (
     <Card className="overflow-hidden border-primary/10 hover:border-primary/20">
       <CardHeader className="bg-gradient-to-r from-violet-900/20 via-primary/10 to-violet-900/20 pb-4">
-        <CardTitle className="flex items-center gap-2">
-          <ListCheck className="h-5 w-5 text-primary" />
-          Todo List
-        </CardTitle>
+        <div className="flex justify-between items-center">
+          <CardTitle className="flex items-center gap-2">
+            <ListCheck className="h-5 w-5 text-primary" />
+            Todo List
+          </CardTitle>
+          <div className="flex items-center space-x-1">
+            <Badge variant="outline" className="bg-primary/10 text-xs">
+              <CheckSquare className="h-3 w-3 mr-1" />
+              {completedTodosCount}
+            </Badge>
+            <Badge variant="outline" className="bg-primary/10 text-xs">
+              <Square className="h-3 w-3 mr-1" />
+              {activeTodosCount}
+            </Badge>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="p-4 sm:p-6">
         <div className="flex gap-2 mb-6">
@@ -107,11 +131,49 @@ const TodoList = () => {
           </Button>
         </div>
 
+        <div className="flex justify-between mb-3">
+          <div className="flex items-center text-xs text-muted-foreground">
+            <Filter className="h-3 w-3 mr-1" />
+            Filter:
+          </div>
+          <div className="flex gap-1">
+            <Button 
+              variant={filter === 'all' ? 'secondary' : 'ghost'} 
+              size="sm" 
+              className="h-7 text-xs px-2"
+              onClick={() => setFilter('all')}
+            >
+              All
+            </Button>
+            <Button 
+              variant={filter === 'active' ? 'secondary' : 'ghost'} 
+              size="sm" 
+              className="h-7 text-xs px-2"
+              onClick={() => setFilter('active')}
+            >
+              Active
+            </Button>
+            <Button 
+              variant={filter === 'completed' ? 'secondary' : 'ghost'} 
+              size="sm" 
+              className="h-7 text-xs px-2"
+              onClick={() => setFilter('completed')}
+            >
+              Completed
+            </Button>
+          </div>
+        </div>
+
         <div className="space-y-2.5 max-h-[400px] overflow-y-auto pr-1">
           {todos.length === 0 ? (
             <div className="text-center p-6 text-muted-foreground border border-dashed border-muted rounded-md">
-              <ListCheck className="h-10 w-10 mx-auto mb-2 opacity-50" />
+              <AlertCircle className="h-10 w-10 mx-auto mb-2 opacity-50" />
               <p>No tasks yet. Add some to get started!</p>
+            </div>
+          ) : filteredTodos.length === 0 ? (
+            <div className="text-center p-6 text-muted-foreground border border-dashed border-muted rounded-md">
+              <ListCheck className="h-10 w-10 mx-auto mb-2 opacity-50" />
+              <p>No {filter} tasks found.</p>
             </div>
           ) : (
             sortedTodos.map((todo) => (
@@ -139,12 +201,17 @@ const TodoList = () => {
                     <div className="flex items-center mt-1 text-xs text-muted-foreground">
                       <Clock className="h-3 w-3 mr-1 opacity-70" />
                       {formatTimeAgo(todo.createdAt)}
+                      <Calendar className="h-3 w-3 ml-2 mr-1 opacity-70" />
+                      {new Date(todo.createdAt).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}
                     </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   {todo.completed && (
-                    <Badge variant="secondary" className="text-xs h-5 px-1.5 bg-primary/20">Done</Badge>
+                    <Badge variant="secondary" className="text-xs h-5 px-1.5 bg-primary/20">
+                      <CheckSquare className="h-3 w-3 mr-1" />
+                      Done
+                    </Badge>
                   )}
                   <Button
                     variant="ghost"

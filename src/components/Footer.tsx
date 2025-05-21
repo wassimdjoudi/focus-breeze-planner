@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Clock, Github, Heart } from 'lucide-react';
+import { Clock, Github, Heart, Mail, Globe, Book, MapPin, Code } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -25,7 +25,8 @@ const Footer = () => {
           
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-x-6 gap-y-2 mt-2 mb-6">
             {['Wassim', 'Issam', 'Idir', 'Younes', 'Anis', 'Aymen'].map((name) => (
-              <span key={name} className="px-3 py-1.5 bg-primary/10 rounded-full text-sm hover:bg-primary/20 transition-colors">
+              <span key={name} className="px-3 py-1.5 bg-primary/10 rounded-full text-sm hover:bg-primary/20 transition-colors flex items-center justify-center">
+                <Code className="h-3 w-3 mr-1.5" />
                 {name}
               </span>
             ))}
@@ -33,8 +34,28 @@ const Footer = () => {
           
           <div className="border-t border-border w-24 my-6"></div>
           
+          <div className="flex items-center justify-center space-x-4 mb-4">
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors flex items-center">
+              <Github className="h-4 w-4 mr-1" />
+              <span className="text-xs">GitHub</span>
+            </a>
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors flex items-center">
+              <Mail className="h-4 w-4 mr-1" />
+              <span className="text-xs">Contact</span>
+            </a>
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors flex items-center">
+              <Globe className="h-4 w-4 mr-1" />
+              <span className="text-xs">Website</span>
+            </a>
+            <a href="#" className="text-muted-foreground hover:text-primary transition-colors flex items-center">
+              <Book className="h-4 w-4 mr-1" />
+              <span className="text-xs">Documentation</span>
+            </a>
+          </div>
+          
           <p className="text-xs text-muted-foreground flex items-center">
-            © {new Date().getFullYear()} USTHB Productivity - All Rights Reserved
+            <MapPin className="h-3 w-3 mr-1.5" />
+            USTHB, Algiers, Algeria - © {new Date().getFullYear()} All Rights Reserved
           </p>
         </div>
       </div>

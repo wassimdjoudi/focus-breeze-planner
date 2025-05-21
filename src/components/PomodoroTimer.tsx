@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { Clock, Play, Pause, RotateCcw } from 'lucide-react';
+import { Clock, Play, Pause, RotateCcw, Settings, Bell, Volume2, Coffee, Brain, Save } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 const PomodoroTimer = () => {
   const [isActive, setIsActive] = useState(false);
@@ -13,6 +14,7 @@ const PomodoroTimer = () => {
   const [focusTime, setFocusTime] = useState(25);
   const [breakTime, setBreakTime] = useState(5);
   const [settingsVisible, setSettingsVisible] = useState(false);
+  const [sessionsCompleted, setSessionsCompleted] = useState(0);
 
   useEffect(() => {
     let interval: number | null = null;
@@ -24,6 +26,12 @@ const PomodoroTimer = () => {
             const newMode = mode === 'focus' ? 'break' : 'focus';
             setMode(newMode);
             setIsActive(false);
+            if (newMode === 'break') {
+              setSessionsCompleted(prev => prev + 1);
+              // Play notification sound when pomodoro is complete
+              const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3');
+              audio.play().catch(e => console.log('Audio play error:', e));
+            }
             return newMode === 'focus' ? focusTime * 60 : breakTime * 60;
           }
           return prev - 1;
@@ -61,6 +69,11 @@ const PomodoroTimer = () => {
     ? ((focusTime * 60 - timeLeft) / (focusTime * 60)) * 100
     : ((breakTime * 60 - timeLeft) / (breakTime * 60)) * 100;
 
+  const saveSettings = () => {
+    setSettingsVisible(false);
+    // Could add toast notification here
+  };
+
   return (
     <Card 
       id="pomodoro"
@@ -72,29 +85,54 @@ const PomodoroTimer = () => {
             <Clock className="h-5 w-5 text-primary" />
             Pomodoro Timer
           </CardTitle>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={() => setSettingsVisible(!settingsVisible)}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="bg-primary/10 text-xs flex items-center">
+              <Brain className="h-3 w-3 mr-1" />
+              {sessionsCompleted} sessions
+            </Badge>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={() => setSettingsVisible(!settingsVisible)}
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col items-center">
           <Tabs defaultValue="focus" value={mode} onValueChange={setMode}>
             <TabsList className="mb-4">
-              <TabsTrigger value="focus">Focus</TabsTrigger>
-              <TabsTrigger value="break">Break</TabsTrigger>
+              <TabsTrigger value="focus" className="flex items-center gap-1">
+                <Brain className="h-4 w-4" />
+                Focus
+              </TabsTrigger>
+              <TabsTrigger value="break" className="flex items-center gap-1">
+                <Coffee className="h-4 w-4" />
+                Break
+              </TabsTrigger>
             </TabsList>
           </Tabs>
 
           {settingsVisible && (
-            <div className="w-full space-y-4 mb-6 bg-muted p-4 rounded-md">
+            <div className="w-full space-y-4 mb-6 bg-muted p-4 rounded-md border border-border/50">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-medium flex items-center">
+                  <Settings className="h-4 w-4 mr-1.5" />
+                  Timer Settings
+                </h3>
+                <Button size="sm" variant="secondary" onClick={saveSettings} className="h-8">
+                  <Save className="h-4 w-4 mr-1.5" />
+                  Save
+                </Button>
+              </div>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>Focus Time (min): {focusTime}</span>
+                  <span className="flex items-center">
+                    <Brain className="h-4 w-4 mr-1.5 text-primary" />
+                    Focus Time (min): {focusTime}
+                  </span>
                 </div>
                 <Slider
                   min={5}
@@ -106,7 +144,10 @@ const PomodoroTimer = () => {
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span>Break Time (min): {breakTime}</span>
+                  <span className="flex items-center">
+                    <Coffee className="h-4 w-4 mr-1.5 text-green-500" />
+                    Break Time (min): {breakTime}
+                  </span>
                 </div>
                 <Slider
                   min={1}
@@ -115,6 +156,15 @@ const PomodoroTimer = () => {
                   value={[breakTime]}
                   onValueChange={(val) => setBreakTime(val[0])}
                 />
+              </div>
+              <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                <span className="text-sm flex items-center">
+                  <Bell className="h-4 w-4 mr-1.5" />
+                  Notification Sound
+                </span>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Volume2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           )}
@@ -146,7 +196,12 @@ const PomodoroTimer = () => {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="text-4xl font-mono font-bold">{formatTime(timeLeft)}</div>
-              <div className="text-xs capitalize text-muted-foreground">{mode} mode</div>
+              <div className="text-xs capitalize text-muted-foreground flex items-center">
+                {mode === 'focus' ? 
+                  <><Brain className="h-3 w-3 mr-1" /> Focus mode</> : 
+                  <><Coffee className="h-3 w-3 mr-1" /> Break mode</>
+                }
+              </div>
             </div>
           </div>
           

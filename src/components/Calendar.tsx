@@ -3,14 +3,16 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar as CalendarIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Plus, Trash2, Tag, Clock, CheckCircle } from 'lucide-react';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format } from 'date-fns';
+import { Badge } from '@/components/ui/badge';
 
 interface Event {
   id: string;
   date: Date;
   title: string;
+  priority?: 'low' | 'medium' | 'high';
 }
 
 const Calendar = () => {
@@ -27,6 +29,7 @@ const Calendar = () => {
     return [];
   });
   const [newEvent, setNewEvent] = useState('');
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium');
 
   React.useEffect(() => {
     localStorage.setItem(
@@ -42,6 +45,7 @@ const Calendar = () => {
       id: Date.now().toString(),
       date: new Date(date),
       title: newEvent,
+      priority
     };
     
     setEvents([...events, event]);
@@ -62,6 +66,14 @@ const Calendar = () => {
     return events.some(
       (event) => format(event.date, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd')
     );
+  };
+
+  const getPriorityColor = (priority?: 'low' | 'medium' | 'high') => {
+    switch (priority) {
+      case 'low': return 'bg-green-500/20 text-green-500';
+      case 'high': return 'bg-red-500/20 text-red-500';
+      default: return 'bg-blue-500/20 text-blue-500';
+    }
   };
 
   return (
@@ -95,41 +107,85 @@ const Calendar = () => {
           />
 
           <div>
-            <h3 className="font-medium mb-2">
+            <h3 className="font-medium mb-2 flex items-center">
+              <Clock className="h-4 w-4 mr-2 text-primary" />
               Events for {format(date, 'MMMM d, yyyy')}
             </h3>
             
-            <div className="flex gap-2 mb-3">
-              <Input
-                placeholder="Add event..."
-                value={newEvent}
-                onChange={(e) => setNewEvent(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addEvent()}
-              />
-              <Button onClick={addEvent} className="shrink-0">
-                Add
-              </Button>
+            <div className="flex flex-col gap-2 mb-3">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add event..."
+                  value={newEvent}
+                  onChange={(e) => setNewEvent(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && addEvent()}
+                />
+                <Button onClick={addEvent} className="shrink-0">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add
+                </Button>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <div className="text-xs text-muted-foreground flex items-center">
+                  <Tag className="h-3 w-3 mr-1" /> Priority:
+                </div>
+                <div className="flex gap-1">
+                  <Button 
+                    size="sm" 
+                    variant={priority === 'low' ? 'default' : 'outline'}
+                    className={`h-7 text-xs ${priority === 'low' ? 'bg-green-600' : ''}`}
+                    onClick={() => setPriority('low')}
+                  >
+                    Low
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant={priority === 'medium' ? 'default' : 'outline'}
+                    className={`h-7 text-xs ${priority === 'medium' ? 'bg-blue-600' : ''}`}
+                    onClick={() => setPriority('medium')}
+                  >
+                    Medium
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant={priority === 'high' ? 'default' : 'outline'}
+                    className={`h-7 text-xs ${priority === 'high' ? 'bg-red-600' : ''}`}
+                    onClick={() => setPriority('high')}
+                  >
+                    High
+                  </Button>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-2">
               {todayEvents.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground flex items-center justify-center p-4 border border-dashed rounded-md">
+                  <CheckCircle className="h-4 w-4 mr-2 opacity-60" />
                   No events scheduled for this day.
                 </p>
               ) : (
                 todayEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="flex items-center justify-between p-2 rounded bg-muted/30"
+                    className="flex items-center justify-between p-2 rounded bg-muted/30 border border-border/50"
                   >
-                    <span>{event.title}</span>
+                    <div className="flex items-center">
+                      <span>{event.title}</span>
+                      {event.priority && (
+                        <Badge variant="outline" className={`ml-2 text-xs ${getPriorityColor(event.priority)}`}>
+                          {event.priority}
+                        </Badge>
+                      )}
+                    </div>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => removeEvent(event.id)}
                       className="h-7 w-7 text-muted-foreground hover:text-destructive"
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trash-2"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" x2="10" y1="11" y2="17"></line><line x1="14" x2="14" y1="11" y2="17"></line></svg>
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))

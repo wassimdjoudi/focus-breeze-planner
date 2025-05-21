@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Clock, ListCheck, CalendarDays, Menu, X } from 'lucide-react';
+import { Clock, ListCheck, CalendarDays, Menu, X, Home, Settings, Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,11 +33,21 @@ const Navbar = () => {
     }`}>
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <div className="flex items-center">
-          <Clock className="h-6 w-6 text-primary mr-2" />
+          <Home className="h-5 w-5 text-primary mr-2" />
           <span className="font-bold text-lg bg-gradient-to-r from-purple-400 via-violet-500 to-indigo-500 bg-clip-text text-transparent">
             USTHB Productivity
           </span>
         </div>
+
+        {/* Dark/Light mode toggle - disabled for now as we're in dark mode */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          className="md:mr-2 hidden md:flex"
+          onClick={() => setIsDarkMode(!isDarkMode)}
+        >
+          {isDarkMode ? <Moon className="h-5 w-5 text-primary" /> : <Sun className="h-5 w-5 text-primary" />}
+        </Button>
 
         {/* Mobile menu button */}
         <Button 
@@ -74,6 +85,12 @@ const Navbar = () => {
             <CalendarDays className="h-4 w-4 mr-2" />
             Calendar
           </Button>
+          <Button 
+            variant="ghost" 
+            size="icon"
+          >
+            <Settings className="h-5 w-5 text-primary" />
+          </Button>
         </nav>
       </div>
 
@@ -105,6 +122,24 @@ const Navbar = () => {
               <CalendarDays className="h-4 w-4 mr-2" />
               Calendar
             </Button>
+            <div className="pt-2 border-t border-border flex items-center justify-between">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="flex items-center justify-start hover:bg-primary/20"
+                onClick={() => setIsDarkMode(!isDarkMode)}
+              >
+                {isDarkMode ? <Moon className="h-4 w-4 mr-2" /> : <Sun className="h-4 w-4 mr-2" />}
+                {isDarkMode ? 'Dark Mode' : 'Light Mode'}
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                className="h-8 w-8"
+              >
+                <Settings className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       )}
