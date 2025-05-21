@@ -33,7 +33,7 @@
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 }
 
@@ -50,6 +50,18 @@
     background-position: center;
     background-attachment: fixed;
     background-repeat: no-repeat;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: -1;
   }
 }
 
@@ -65,18 +77,72 @@
 
 .pomodoro-container {
   transition: background-color 0.5s ease;
-  box-shadow: 0 0 30px rgba(149, 128, 255, 0.2);
+  box-shadow: 0 0 30px rgba(149, 128, 255, 0.3);
 }
 
 /* Add these styles for better readability with the background image */
 .card, .bg-card, .bg-card\/60 {
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
   background-color: rgba(23, 23, 23, 0.75) !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 45px rgba(149, 128, 255, 0.2);
 }
 
 .container {
   position: relative;
   z-index: 10;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(23, 23, 23, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(149, 128, 255, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(149, 128, 255, 0.7);
+}
+
+/* Improved buttons */
+button {
+  transition: all 0.2s ease-in-out !important;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* Improved inputs */
+input, textarea, select {
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 2px rgba(149, 128, 255, 0.2);
+}
+
+/* Text styling */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.025em;
 }
